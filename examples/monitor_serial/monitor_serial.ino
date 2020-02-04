@@ -12,6 +12,8 @@ USO:
     2 : Seleciona o envio de comandos para o canal 2
     
     n : Solicita o nível atual do canal selecionado (resposta de 0 à 70)
+
+    h : Reabre a lista de comandos
     
 LIGAÇÕES DO MÓDULO AO ARDUINO:
   GND: CONECTAR AO GND DO ARDUINO
@@ -69,6 +71,7 @@ void setup(){
   Serial.println("1 : Seleciona o envio de comandos para o canal 1");
   Serial.println("2 : Seleciona o envio de comandos para o canal 2");
   Serial.println("n : Solicita o nivel atual do canal selecionado (resposta de 0 a 70)");
+  Serial.println("h : Reabre a lista de comandos");
 }
 
 void loop(){
@@ -188,7 +191,37 @@ void loop(){
             Serial.print("Feedback canal 1: ");
             Serial.println(dimmer.feedback(0), DEC);
           }
-        break;        
+        break;
+
+        case 'h':  //Lista novamente a lista de comandos
+          //Mostra a lista de comandos no monitor serial (Abra o monitor serial)
+          Serial.println("Lista de comandos:");
+          Serial.println("a : Envia um comando para mudar 1 nivel do dimmer aumentando");
+          Serial.println("d : Envia um comando para mudar 1 nivel do dimmer diminuindo");
+          Serial.println("A : Envia um comando para mudar 5 niveis do dimmer aumentando");
+          Serial.println("D : Envia um comando para mudar 5 niveis do dimmer diminuindo");
+          Serial.println("1 : Seleciona o envio de comandos para o canal 1");
+          Serial.println("2 : Seleciona o envio de comandos para o canal 2");
+          Serial.println("n : Solicita o nivel atual do canal selecionado (resposta de 0 a 70)");
+          Serial.println("h : Reabre a lista de comandos");
+        break;
+
+        default://Se receber um comando não listado, mostra a lista também
+          //Mostra a lista de comandos no monitor serial (Abra o monitor serial)
+          Serial.println("Lista de comandos:");
+          Serial.println("a : Envia um comando para mudar 1 nivel do dimmer aumentando");
+          Serial.println("d : Envia um comando para mudar 1 nivel do dimmer diminuindo");
+          Serial.println("A : Envia um comando para mudar 5 niveis do dimmer aumentando");
+          Serial.println("D : Envia um comando para mudar 5 niveis do dimmer diminuindo");
+          Serial.println("1 : Seleciona o envio de comandos para o canal 1");
+          Serial.println("2 : Seleciona o envio de comandos para o canal 2");
+          Serial.println("n : Solicita o nivel atual do canal selecionado (resposta de 0 a 70)");
+          Serial.println("h : Reabre a lista de comandos");
+        break;
+
+        case 10:  //byte enviado pelo monitor serial após os caracteres digitados
+          //Não faz nada, é o byte enviado pelo monitor serial após os caracteres digitados
+        break;
     }
   }
 }
