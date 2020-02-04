@@ -11,6 +11,8 @@ USO:
     2 : Seleciona o envio de comandos para o canal 2
     
     n : Solicita o nível atual do canal selecionado (resposta de 0 à 70)
+  
+    h : Reabre a lista de comandos
 
   * POTENCIÔMETRO ROTATIVO (ENCODER)
     Botão: Muda de canal que está sendo controlado
@@ -44,7 +46,7 @@ DURAÇÃO DOS PULSOS NO PINO 'SIG':
   Duração entre 500uS e 35000uS: Define o nível atual, sendo cada 500uS 1 nível, totalizando 70 níveis
   Menos de 500uS: Nível 0, saída desligada
   Entre 40000uS e 50000uS: Solicita o nível atual do canal em selecionado. Após enviar o pulso, coloque o pino que enviou o pulso como entrada. 100uS após receber o comando, o dimmer
-	colocará o pino SIG em nível 0, passados mais 100uS o pino SIG enviará um pulso com duração correspondente ao nível atual do canal, sendo: 500uS para o nível 1, 35000uS para o nível 70 e 100uS para o nível 0.
+  colocará o pino SIG em nível 0, passados mais 100uS o pino SIG enviará um pulso com duração correspondente ao nível atual do canal, sendo: 500uS para o nível 1, 35000uS para o nível 70 e 100uS para o nível 0.
 */
 
 #include <DM02A.h>  //Inclui a biblioteca para comunicar com o dimmer DM02A
@@ -63,10 +65,10 @@ char nivel_2 = 0;
 char nivel_1_tmp = 0;   //Armazena o nível temporariamente para comprar com o nível previamente ajustado e saber se mudou
 char nivel_2_tmp = 0;
 
-boolean canal = 0;	//Armazena internamente qual o canal selecionado
-char comando = 0;	//Armazena o comando recebido pela porta serial (Enviado pelo monitor serial)
+boolean canal = 0;  //Armazena internamente qual o canal selecionado
+char comando = 0; //Armazena o comando recebido pela porta serial (Enviado pelo monitor serial)
 
-boolean novo_comando = 0;	//Indica se foi recebido um novo comando pela porta serial
+boolean novo_comando = 0; //Indica se foi recebido um novo comando pela porta serial
 
 unsigned long last_tempo = 0;//Armazena o momento da última solicitação automática de feedback, a função time() reinicia em 50 dias com o Arduino constantemente ligado
 
@@ -100,6 +102,7 @@ void setup(){
   Serial.println("1 : Seleciona o envio de comandos para o canal 1");
   Serial.println("2 : Seleciona o envio de comandos para o canal 2");
   Serial.println("n : Solicita o nivel atual do canal selecionado (resposta de 0 a 70)");
+  Serial.println("h : Reabre a lista de comandos");
 }
 
 void loop(){
@@ -187,12 +190,12 @@ void loop(){
   if(novo_comando){//Confere se recebeu um novo comando, essa variável recebe o valor 1 (HIGH) quando chega um novo dado pela porta serial, isso dentro da interrupção da porta serial
     novo_comando = 0;//Limpa a variável que indica que recebeu um novo comando para não executar o mesmo comando mais de uma vez
     ajustou_encoder = 0;//Se receber comando pela serial, ignora que ajustou o nível pelo potenciômetro rotativo (encoder)
-	  if(canal){//Se estiver em 1 é o canal 2
+    if(canal){//Se estiver em 1 é o canal 2
         nivel_2 = dimmer.feedback(1);
     }else{//Se estiver em 0 é o canal 1
-		    nivel_1 = dimmer.feedback(0);
+        nivel_1 = dimmer.feedback(0);
     }
-	  
+    
     switch(comando){//Verifica qual é o comando, só executa comandos válidos
         case 'a':  //Aumenta o nível de 1 em 1 unidade
           if(canal == 0){//Em 0 é o canal 1,
@@ -301,7 +304,38 @@ void loop(){
             Serial.print("Feedback canal 1: ");
             Serial.println(dimmer.feedback(0), DEC);
           }
-        break;        
+        break;
+    
+        case 'h':  //Lista novamente a lista de comandos
+          //Mostra a lista de comandos no monitor serial (Abra o monitor serial)
+          Serial.println("Lista de comandos:");
+          Serial.println("a : Envia um comando para mudar 1 nivel do dimmer aumentando");
+          Serial.println("d : Envia um comando para mudar 1 nivel do dimmer diminuindo");
+          Serial.println("A : Envia um comando para mudar 5 niveis do dimmer aumentando");
+          Serial.println("D : Envia um comando para mudar 5 niveis do dimmer diminuindo");
+          Serial.println("1 : Seleciona o envio de comandos para o canal 1");
+          Serial.println("2 : Seleciona o envio de comandos para o canal 2");
+          Serial.println("n : Solicita o nivel atual do canal selecionado (resposta de 0 a 70)");
+          Serial.println("h : Reabre a lista de comandos");
+        break;
+
+        default://Se receber um comando não listado, mostra a lista também
+          //Mostra a lista de comandos no monitor serial (Abra o monitor serial)
+          Serial.println("Lista de comandos:");
+          Serial.println("a : Envia um comando para mudar 1 nivel do dimmer aumentando");
+          Serial.println("d : Envia um comando para mudar 1 nivel do dimmer diminuindo");
+          Serial.println("A : Envia um comando para mudar 5 niveis do dimmer aumentando");
+          Serial.println("D : Envia um comando para mudar 5 niveis do dimmer diminuindo");
+          Serial.println("1 : Seleciona o envio de comandos para o canal 1");
+          Serial.println("2 : Seleciona o envio de comandos para o canal 2");
+          Serial.println("n : Solicita o nivel atual do canal selecionado (resposta de 0 a 70)");
+          Serial.println("h : Reabre a lista de comandos");
+        break;
+
+        case 10:  //byte enviado pelo monitor serial após os caracteres digitados
+          //Não faz nada, é o byte enviado pelo monitor serial após os caracteres digitados
+        break;
+      
     }
   }
 }
