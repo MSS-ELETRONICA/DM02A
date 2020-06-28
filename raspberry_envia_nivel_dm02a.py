@@ -1,3 +1,5 @@
+#Código exemplo para Rasberry criado e fornecido pelo nosso amigo Leonardo Oliveira - knowdbtech (https://github.com/knowdbtech). Obrigado pela contribuição Leonardo.
+
 import RPi.GPIO as GPIO
 import time,sys
 
